@@ -18,3 +18,7 @@ class Evento(models.Model):
     # Altera como será mostrado no Painel
     # def __str__(self):
     #     return self.titulo
+
+    # Formatando a data
+    def get_data_evento(self):
+        return self.data_evento.strftime('%d/%m/%Y %H:%M')
