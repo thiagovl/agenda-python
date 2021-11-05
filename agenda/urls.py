@@ -22,8 +22,13 @@ from django.views.generic import RedirectView # Redirecionamento
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('agenda/', views.lista_eventos),
+    path('login/', views.login_user),
+    path('login/submit', views.login_submit),
+    path('logout/', views.logout_user),
     path('', RedirectView.as_view(url='/agenda/')),
     # path('', views.index), # redirecionamento
     path('evento/<titulo_evento>', views.get_Evento),
     # path('eventos/', views.getEventos),
 ]
+
+# Para o metodo GET deve ter a "/" no final, para POST não
