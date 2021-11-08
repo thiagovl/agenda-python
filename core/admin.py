@@ -5,7 +5,7 @@ from core.models import Evento
 
 # Altera como será mostrado no Painel Admin
 class EventoAdmin(admin.ModelAdmin):
-    list_display = ('titulo', 'data_evento', 'data_criacao')
+    list_display = ('id', 'titulo', 'data_evento', 'data_criacao', 'usuario')
     list_filter = ('usuario', 'data_evento',) # cria um filtro, sempre deixar a virgula no final
 
 admin.site.register(Evento, EventoAdmin)

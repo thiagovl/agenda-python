@@ -52,19 +52,47 @@ def logout_user(request):
 
 @login_required(login_url='/login/')
 def evento(request):
-    return render(request, 'evento.html')
+    id_evento = request.GET.get('id')
+    dados = {}
+    if id_evento:
+        dados['evento'] = Evento.objects.get(id=id_evento)
+    return render(request, 'evento.html', dados)
 
+@login_required(login_url='/login/')
 def salvar(request):
     if request.POST:
         titulo = request.POST.get('titulo')
         descricao = request.POST.get('descricao')
         data_evento = request.POST.get('data_evento')
         usuario = request.user
-        Evento.objects.create(
-            titulo=titulo,
-            descricao=descricao,
-            data_evento=data_evento,
-            usuario=usuario
-        )
-
+        id_evento = request.POST.get('id_evento')
+        if id_evento:
+            # Evento.objects.filter(id=id_evento).update(
+            #     titulo=titulo,
+            #     descricao=descricao,
+            #     data_evento=data_evento,
+            # )
+            # outra forma
+            evento = Evento.objects.get(id=id_evento)
+            if evento.usuario == usuario:
+                evento.titulo = titulo
+                evento.descricao = descricao
+                evento.data_evento = data_evento
+                evento.save()
+        else:
+            Evento.objects.create(
+                titulo=titulo,
+                descricao=descricao,
+                data_evento=data_evento,
+                usuario=usuario
+            )
     return redirect('/')
+
+@login_required(login_url='/login/')
+def delete(request, id):
+    usuario = request.user
+    evento = Evento.objects.get(id=id)
+    if usuario == evento.usuario:
+        evento.delete()
+    return redirect('/')
+
