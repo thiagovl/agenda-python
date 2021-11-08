@@ -49,3 +49,22 @@ def login_submit(request):
 def logout_user(request):
     logout(request)
     return redirect('/')
+
+@login_required(login_url='/login/')
+def evento(request):
+    return render(request, 'evento.html')
+
+def salvar(request):
+    if request.POST:
+        titulo = request.POST.get('titulo')
+        descricao = request.POST.get('descricao')
+        data_evento = request.POST.get('data_evento')
+        usuario = request.user
+        Evento.objects.create(
+            titulo=titulo,
+            descricao=descricao,
+            data_evento=data_evento,
+            usuario=usuario
+        )
+
+    return redirect('/')
