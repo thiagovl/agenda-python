@@ -1,8 +1,12 @@
+from django.db.models.expressions import F
+from django.http import request
 from django.shortcuts import render, HttpResponse, redirect
 from core.models import Evento
 from django.contrib.auth.decorators import login_required # importando o decoration de login
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
+from datetime import datetime, timedelta
+from django.http.response import Http404, JsonResponse
 
 # Create your views here.
 
@@ -20,7 +24,8 @@ def get_Evento(request, titulo_evento):
 def lista_eventos(request):
     # eventos = Evento.objects.all()
     usuario = request.user # pegando o usuário logado 
-    eventos = Evento.objects.filter(usuario=usuario)
+    data_atual = datetime.now() - timedelta(hours=1)
+    eventos = Evento.objects.filter(usuario=usuario, data_evento__gt=data_atual) # __lt= traz anterior a data_atual, __gt= traz a data_atual e os posteriores a data_atual
     dados = {'eventos': eventos, 'usuario':usuario}
     return render(request, 'agenda.html', dados)
 
@@ -90,9 +95,22 @@ def salvar(request):
 
 @login_required(login_url='/login/')
 def delete(request, id):
+    try:
+        evento = Evento.objects.get(id=id)
+    except Exception:
+        raise Http404()
+
     usuario = request.user
     evento = Evento.objects.get(id=id)
     if usuario == evento.usuario:
         evento.delete()
+    else:
+        raise Http404()
     return redirect('/')
 
+@login_required(login_url='/login/')
+def json_lista_evento(request):
+    usuario = request.user
+    eventos = Evento.objects.filter(usuario=usuario).values('id', 'titulo') # __lt= traz anterior a data_atual, __gt= traz a data_atual e os posteriores a data_atual
+    return JsonResponse(list(eventos), safe=False)
+    # return JsonResponse({'title': 'teste'}) não precisa utilizar o safe=False
